@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.urls import reverse
 from django.contrib.auth import authenticate, login
 from . models import Room, Topic
 from . forms import RoomForm
@@ -62,8 +63,10 @@ def createRoom(request):
     if request.method == 'POST':
         form = RoomForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('base:home')
+            room = form.save()
+            messages.success(request, 'Room created successfully!')
+            print(dir(room))
+            return redirect('base:room', pk=room.id)
     context = {'form' : form}
     return render(request, 'base/room_form.html', context)
 
