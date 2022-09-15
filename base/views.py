@@ -3,36 +3,37 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.urls import reverse
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,logout
 from . models import Room, Topic
 from . forms import RoomForm
+from django.contrib.auth.decorators import login_required
 
 
 def loginPage(request):
 
     if request.method == 'POST':
         username = request.POST.get('username')
-        password = request.POST.get("password")
+        password = request.POST.get('password')
 
         try:
-            user = User.objects.get(username = username)
+            user = User.objects.get(username=username)
         except:
-            messages.error(request, 'User Does not exist!!!!')
+            messages.error(request, "User doesn't exist")
         
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=username,password=password)
 
         if user is not None:
-            login(request,user)
+            login(request, user)
             return redirect('base:home')
-        
         else:
-            messages.error(request, "username or password is wrong!!")
+            messages.error(request,     "Username or password does not exist")
 
     context = {}
     return render(request,'base/login_register.html', context)
 
 def logoutPage(request):
-    pass
+    logout(request)
+    return redirect('base:home')
 
 def home(request):
     # list_of_rooms = Room.objects.order_by('created')
@@ -57,7 +58,7 @@ def room(request,pk):
     context = {'room' : room }
     return render(request, 'base/room.html', context)
 
-
+@login_required(login_url='base:login')
 def createRoom(request):
     form = RoomForm()
     if request.method == 'POST':
@@ -70,6 +71,7 @@ def createRoom(request):
     context = {'form' : form}
     return render(request, 'base/room_form.html', context)
 
+@login_required(login_url='base:login')
 def updateRoom(request,pk):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance= room)
