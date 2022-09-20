@@ -32,8 +32,10 @@
         <div>
         {% for room in list_of_rooms %}
             <div>
+                {% if request.user == room.host %}
                 <a href="{% url 'base:update-room' room.id %}">Edit</a>
                 <a href="{% url 'base:delete-room' room.id %} ">Delete</a>
+                {% endif %}
                 <span>@{{room.host.username}} </span>
                 <h4>{{ forloop.counter }} <a href="{% url 'base:room' room.id %}">{{room.name}}</a> </h4> 
                 <small>{{room.topic.name}}</small>
